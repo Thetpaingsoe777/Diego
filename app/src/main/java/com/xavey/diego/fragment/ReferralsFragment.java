@@ -30,6 +30,8 @@ public class ReferralsFragment extends Fragment {
 
     private Context mContext;
 
+    String login_user;
+
     public ReferralsFragment() {
 
     }

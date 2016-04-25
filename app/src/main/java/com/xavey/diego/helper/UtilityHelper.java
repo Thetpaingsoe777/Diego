@@ -66,7 +66,7 @@ public class UtilityHelper {
             dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         }
         else {
-            dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         }
 
         return dateFormat.format(d);
@@ -79,7 +79,7 @@ public class UtilityHelper {
             format = new SimpleDateFormat("yyyy-MM-dd");
         }
         else {
-            format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         }
         Date formattedDate = null;
         try {

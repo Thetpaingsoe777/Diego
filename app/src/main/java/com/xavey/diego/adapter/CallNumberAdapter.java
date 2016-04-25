@@ -2,6 +2,7 @@ package com.xavey.diego.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,9 @@ import android.widget.TextView;
 
 import com.xavey.diego.R;
 import com.xavey.diego.activity.CreateActivity;
+import com.xavey.diego.activity.DashboardActivity;
 import com.xavey.diego.api.model.CallNumber;
+import com.xavey.diego.fragment.ProspectsFragment;
 
 import java.util.List;
 
@@ -64,24 +67,7 @@ public class CallNumberAdapter extends BaseAdapter {
         mHolder.tvProsNumber.setText(number.getNumber());
         mHolder.tvProsStatus.setText(number.getStatus());
 
-        child.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        loadNumberDetails(number);
-                    }
-
-                }
-        );
-
         return child;
-    }
-
-    private void loadNumberDetails(CallNumber n){
-        //click list item
-        Intent intent = new Intent(mContext, CreateActivity.class);
-        intent.putExtra(CreateActivity.P_NUMBER, n.getNumber());
-        mContext.startActivity(intent);
     }
 
     static class ViewHolder{

@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.xavey.diego.R;
 import com.xavey.diego.api.SampleClient;
 import com.xavey.diego.api.model.User;
+import com.xavey.diego.helper.AppValues;
 import com.xavey.diego.helper.DBHelper;
 import com.xavey.diego.api.model.Auth;
 import com.xavey.diego.helper.UtilityHelper;
@@ -53,11 +54,15 @@ public class LoginActivity extends AppCompatActivity {
         User loggedinUser = new User();
         loggedinUser = dbH.login(id, password);
         if (loggedinUser.getUser_name() != null) {
+
+            AppValues.getInstance().loginUser = loggedinUser;
+
+
             Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
             finish();
             Intent intent = new Intent();
             intent.setClass(LoginActivity.this, DashboardActivity.class);
-            intent.putExtra("U_NAME", id);
+//            intent.putExtra("U_NAME", id);
             startActivity(intent);
         }
         else {

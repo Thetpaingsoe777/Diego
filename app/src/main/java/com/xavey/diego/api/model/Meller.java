@@ -15,6 +15,8 @@ public class Meller extends User {
     private String bank_account;
     private String smoker;
     private String drinker;
+    private String referrer;
+    private String status;
 
     public Meller() {
     }
@@ -30,6 +32,8 @@ public class Meller extends User {
     public String getBankAccount() { return this.bank_account; }
     public String getSmoker() { return this.smoker; }
     public String getDrinker() { return this.drinker; }
+    public String getReferrer() { return this.referrer; }
+    public String getStatus() { return this.status; }
 
     public void setMarital(String marital) { this.marital = marital; }
     public void setEmployment(String employment) { this.employment = employment; }
@@ -42,5 +46,7 @@ public class Meller extends User {
     public void setBankAccount(String bank_account) { this.bank_account = bank_account; }
     public void setSmoker(String smoker) { this.smoker = smoker; }
     public void setDrinker(String drinker) { this.drinker = drinker; }
+    public void setReferrer(String referrer) { this.referrer = referrer; }
+    public void setStatus(String status) { this.status = status; }
 
 }

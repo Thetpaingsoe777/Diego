@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.xavey.diego.R;
 import com.xavey.diego.api.model.Meller;
+import com.xavey.diego.helper.AppValues;
 import com.xavey.diego.helper.DBHelper;
 import com.xavey.diego.helper.UtilityHelper;
 
@@ -528,6 +529,7 @@ public class CreateActivity extends AppCompatActivity {
     ArrayAdapter<String> raceAdapter;
     ArrayAdapter<String> telcoAdapter;
 
+    String login_user;
 
     private void setDateTimeField() {
 
@@ -712,6 +714,8 @@ public class CreateActivity extends AppCompatActivity {
         m.setTelco(strTelco);
         m.setReligion(strReligion);
         m.setRace(strRace);
+        m.setReferrer(AppValues.getInstance().loginUser.getUser_name());
+        m.setStatus("unsync");
 
         try {
             dbH.createMeller(m);
@@ -760,7 +764,7 @@ public class CreateActivity extends AppCompatActivity {
 //        dpDOB.getDatePicker().setCalendarViewShown(false);
 
         TextView txtMobile = (TextView) findViewById(R.id.txtMobileNumber);
-        txtMobile.setText(P_NUMBER);
+        txtMobile.setText(getIntent().getStringExtra(P_NUMBER));
 
         txtDOB = (TextView) findViewById(R.id.txtDOB);
         txtDOB.setOnClickListener(new View.OnClickListener() {

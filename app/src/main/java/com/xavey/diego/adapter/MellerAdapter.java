@@ -13,6 +13,8 @@ import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.R;
 import com.xavey.diego.helper.UtilityHelper;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 /**
@@ -59,6 +61,9 @@ public class MellerAdapter extends BaseAdapter {
             mHolder.tvNumber = (TextView) child.findViewById(R.id.list_item_ref_number);
             mHolder.tvGender = (TextView) child.findViewById(R.id.list_item_ref_gender);
             mHolder.tvDOB = (TextView) child.findViewById(R.id.list_item_ref_dob);
+            mHolder.tvCreatedOn = (TextView) child.findViewById(R.id.list_item_ref_created);
+            mHolder.tvReferrer = (TextView) child.findViewById(R.id.list_item_ref_referrer);
+            mHolder.tvStatus = (TextView) child.findViewById(R.id.list_item_ref_status);
             child.setTag(mHolder);
         } else {
             mHolder = (ViewHolder) child.getTag();
@@ -68,6 +73,9 @@ public class MellerAdapter extends BaseAdapter {
         mHolder.tvNumber.setText(user.getPhone());
         mHolder.tvGender.setText(user.getGender());
         mHolder.tvDOB.setText(UtilityHelper.getDateTime(user.getDob(),true));
+        mHolder.tvCreatedOn.setText(user.getCreatedOn().toString());
+        mHolder.tvReferrer.setText(user.getReferrer());
+        mHolder.tvStatus.setText(user.getStatus());
 
         child.setOnClickListener(
                 new View.OnClickListener() {
@@ -95,6 +103,10 @@ public class MellerAdapter extends BaseAdapter {
         TextView tvNumber;
         TextView tvGender;
         TextView tvDOB;
+
+        TextView tvCreatedOn;
+        TextView tvReferrer;
+        TextView tvStatus;
 
     }
 }

@@ -26,6 +26,7 @@ import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.api.model.User;
 import com.xavey.diego.fragment.ProspectsFragment;
 import com.xavey.diego.fragment.ReferralsFragment;
+import com.xavey.diego.helper.AppValues;
 import com.xavey.diego.helper.DBHelper;
 import com.xavey.diego.helper.UtilityHelper;
 
@@ -36,7 +37,6 @@ public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Context mContext;
-    private User loggedinUser;
     String AuthToken="";
 
     @Override
@@ -82,11 +82,9 @@ public class DashboardActivity extends AppCompatActivity
 
         final DBHelper dbH = new DBHelper(mContext);
         try {
-            loggedinUser = dbH.getLoggedinUser(getIntent().getStringExtra("U_NAME"));
-
             View v = (View) navigationView.getHeaderView(0);
             TextView tvMID = (TextView)v.findViewById(R.id.txtDrawerMellerID);
-            tvMID.setText(loggedinUser.getFull_name());
+            tvMID.setText(AppValues.getInstance().loginUser.getFull_name());
             TextView tvMobile = (TextView)v.findViewById(R.id.txtDrawerMobile);
             Date d=new Date();
             tvMobile.setText(UtilityHelper.getDateTime(d,false));
@@ -151,9 +149,6 @@ public class DashboardActivity extends AppCompatActivity
         } else if (id == R.id.nav_prospects) {
             if (findViewById(R.id.container) != null) {
                 Fragment newFragment = new ProspectsFragment();
-                Bundle arg = new Bundle();
-                arg.putString("login_user",loggedinUser.get_id());
-                newFragment.setArguments(arg);
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.container, newFragment);
                 transaction.addToBackStack(null);

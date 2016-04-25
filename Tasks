@@ -19,9 +19,9 @@ Done - Finish new meller activity after save success
 Done - Fix dob display in referral list item
 Done - Log out menu, end dashboard and go back to login
 Done - Show a list of numbers to call that's assigned to this user
+Done - Create a new call, Dialler app
+Done - Add created_on, referrer fields to meller table
 
-Create a new call, Dialler app
-
+Call save -> update status of that number
 Auto refresh listview after adding new meller
-
 Synchronize the new users to mell db

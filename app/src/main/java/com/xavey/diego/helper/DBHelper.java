@@ -12,6 +12,7 @@ import com.xavey.diego.api.model.CallNumber;
 import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.api.model.User;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -81,6 +82,9 @@ public class DBHelper extends SQLiteOpenHelper {
     protected static final String M_BANK = "bank_account";
     protected static final String M_SMOKE = "smoker";
     protected static final String M_DRINK = "drinker";
+    protected static final String M_CREATED = "created_on";
+    protected static final String M_REFERRER = "referrer_id";
+    protected static final String M_STATUS = "status";
 
     // number column names
     protected static final String P_ID = "_id";
@@ -119,7 +123,10 @@ public class DBHelper extends SQLiteOpenHelper {
             + M_RACE + " TEXT,"
             + M_BANK + " TEXT,"
             + M_SMOKE + " TEXT,"
-            + M_DRINK + " TEXT)";
+            + M_DRINK + " TEXT,"
+            + M_CREATED + " TEXT,"
+            + M_REFERRER + " TEXT,"
+            + M_STATUS + " TEXT)";
 
     // Number table create statement
     private static final String CREATE_TABLE_CALLLIST = "CREATE TABLE IF NOT EXISTS "
@@ -165,12 +172,12 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // on upgrade drop older tables
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MELLER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CALL_LIST);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_AUTH);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MELLER);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CALL_LIST);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_AUTH);
         // create new tables
-        onCreate(db);
+//        onCreate(db);
     }
 
     public void updateCheckedNoti(String id, Date date) throws Exception {
@@ -266,6 +273,14 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(M_BANK, meller.getBankAccount());
         values.put(M_SMOKE, meller.getSmoker());
         values.put(M_DRINK, meller.getDrinker());
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        values.put(M_CREATED, dateFormat.format(date).toString());
+
+        values.put(M_REFERRER, meller.getReferrer());
+        values.put(M_STATUS, meller.getStatus());
+
         db.insert(TABLE_MELLER, null, values);
     }
 
@@ -292,7 +307,7 @@ public class DBHelper extends SQLiteOpenHelper {
             loginUser.setHashed_password(c.getString(c.getColumnIndex(U_HASHED_PASSWORD)));
             loginUser.setPhone(c.getString(c.getColumnIndex(U_PHONE)));
             loginUser.setUser_name(c.getString(c.getColumnIndex(U_USER_NAME)));
-            //u.setName(c.getString(c.getColumnIndex(U_NAME)));
+            loginUser.setFullName(c.getString(c.getColumnIndex(U_NAME)));
         }
 
         return loginUser;
@@ -329,6 +344,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 m.setBankAccount(mCursor.getString(mCursor.getColumnIndex(M_BANK)));
                 m.setSmoker(mCursor.getString(mCursor.getColumnIndex(M_SMOKE)));
                 m.setDrinker(mCursor.getString(mCursor.getColumnIndex(M_DRINK)));
+                String strCreatedOn = mCursor.getString(mCursor.getColumnIndex(M_CREATED));
+                m.setCreatedOn(UtilityHelper.getDateTime(strCreatedOn,false));
+                m.setReferrer(mCursor.getString(mCursor.getColumnIndex(M_REFERRER)));
+                m.setStatus(mCursor.getString(mCursor.getColumnIndex(M_STATUS)));
 
                 try {
                     mellers.add(m);
@@ -416,11 +435,12 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO user (_id,user_name,hashed_password,name) VALUES (\"shwesin\",\"shwesin\",\"7653\",\"Shwe Sin\");");
     }
 
-    public ArrayList<CallNumber> getNumbers(String login_user) {
+    public ArrayList<CallNumber> getNumbers() {
+
 
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_CALL_LIST +
-                " WHERE assigned_id = '" + login_user + "'";
+                " WHERE assigned_id = '" + AppValues.getInstance().loginUser.getUser_name() + "'";
         Log.e(LOG, selectQuery);
         Cursor mCursor = db.rawQuery(selectQuery, null);
 
