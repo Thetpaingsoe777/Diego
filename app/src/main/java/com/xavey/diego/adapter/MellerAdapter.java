@@ -73,29 +73,16 @@ public class MellerAdapter extends BaseAdapter {
         mHolder.tvNumber.setText(user.getPhone());
         mHolder.tvGender.setText(user.getGender());
         mHolder.tvDOB.setText(UtilityHelper.getDateTime(user.getDob(),true));
-        mHolder.tvCreatedOn.setText(user.getCreatedOn().toString());
+        if (user.getCreatedOn() != null) {
+            mHolder.tvCreatedOn.setText(user.getCreatedOn().toString());
+        }
+        else {
+            Toast.makeText(mContext, "Invalid created date.", Toast.LENGTH_SHORT).show();
+        }
         mHolder.tvReferrer.setText(user.getReferrer());
         mHolder.tvStatus.setText(user.getStatus());
 
-        child.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        loadProfile(user.get_id());
-                    }
-
-                }
-        );
-
         return child;
-    }
-
-    private void loadProfile(String id){
-        //click list item
-//        Log.d("CLICK ITEM", id);
-//        Intent intent = new Intent(mContext, ProfileActivity.class);
-//        intent.putExtra(ProfileActivity.EXTRA_ITEM, id);
-//        mContext.startActivity(intent);
     }
 
     static class ViewHolder{
@@ -107,6 +94,5 @@ public class MellerAdapter extends BaseAdapter {
         TextView tvCreatedOn;
         TextView tvReferrer;
         TextView tvStatus;
-
     }
 }

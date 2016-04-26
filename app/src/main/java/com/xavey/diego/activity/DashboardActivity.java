@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,21 +15,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.xavey.diego.R;
-import com.xavey.diego.adapter.MellerAdapter;
-import com.xavey.diego.api.model.Meller;
-import com.xavey.diego.api.model.User;
 import com.xavey.diego.fragment.ProspectsFragment;
 import com.xavey.diego.fragment.ReferralsFragment;
 import com.xavey.diego.helper.AppValues;
 import com.xavey.diego.helper.DBHelper;
 import com.xavey.diego.helper.UtilityHelper;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 public class DashboardActivity extends AppCompatActivity

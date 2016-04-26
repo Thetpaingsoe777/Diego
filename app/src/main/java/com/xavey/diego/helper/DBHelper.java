@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.telecom.Call;
 import android.util.Log;
 
 import com.xavey.diego.api.model.Auth;
@@ -273,11 +274,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(M_BANK, meller.getBankAccount());
         values.put(M_SMOKE, meller.getSmoker());
         values.put(M_DRINK, meller.getDrinker());
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        values.put(M_CREATED, dateFormat.format(date).toString());
-
+        values.put(M_CREATED, UtilityHelper.getDateTime(meller.getCreatedOn(),false).toString());
         values.put(M_REFERRER, meller.getReferrer());
         values.put(M_STATUS, meller.getStatus());
 
@@ -344,7 +341,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 m.setBankAccount(mCursor.getString(mCursor.getColumnIndex(M_BANK)));
                 m.setSmoker(mCursor.getString(mCursor.getColumnIndex(M_SMOKE)));
                 m.setDrinker(mCursor.getString(mCursor.getColumnIndex(M_DRINK)));
+
                 String strCreatedOn = mCursor.getString(mCursor.getColumnIndex(M_CREATED));
+
                 m.setCreatedOn(UtilityHelper.getDateTime(strCreatedOn,false));
                 m.setReferrer(mCursor.getString(mCursor.getColumnIndex(M_REFERRER)));
                 m.setStatus(mCursor.getString(mCursor.getColumnIndex(M_STATUS)));
@@ -468,5 +467,22 @@ public class DBHelper extends SQLiteOpenHelper {
         mCursor.close();
 
         return numbers;
+    }
+
+    public void updateCallNumberStatus(String number, String status) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("update call_list set status ='" + status + "' where number = '" + number + "' ");
+        AppValues.getInstance().mNumbers = this.getNumbers();
+
+        if (AppValues.getInstance().mNumbers != null &&
+        AppValues.getInstance().mNumbers.size() > 0) {
+            for (CallNumber cn : AppValues.getInstance().mNumbers) {
+                if (cn.getNumber().equals(number)) {
+                    cn.setStatus(status);
+                }
+            }
+
+            AppValues.getInstance().callNumberAdapter.notifyDataSetChanged();
+        }
     }
 }

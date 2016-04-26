@@ -2,6 +2,10 @@ package com.xavey.diego.helper;
 
 import android.os.Environment;
 
+import com.xavey.diego.adapter.CallNumberAdapter;
+import com.xavey.diego.adapter.MellerAdapter;
+import com.xavey.diego.api.model.CallNumber;
+import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.api.model.User;
 
 import java.io.File;
@@ -20,6 +24,11 @@ public class AppValues{
     public static User loginUser = new User();
 
     public static String GCM_ID="";
+
+    public static MellerAdapter mellerAdapter;
+    public ArrayList<Meller> mellers = null;
+    public static CallNumberAdapter callNumberAdapter;
+    public ArrayList<CallNumber> mNumbers = null;
 
     private AppValues(){
     }

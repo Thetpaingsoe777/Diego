@@ -17,7 +17,9 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.squareup.okhttp.internal.Util;
 import com.xavey.diego.R;
 import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.helper.AppValues;
@@ -26,6 +28,7 @@ import com.xavey.diego.helper.UtilityHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class CreateActivity extends AppCompatActivity {
@@ -702,7 +705,13 @@ public class CreateActivity extends AppCompatActivity {
         }
 
         m.setCurrentCity(strCurrentState + "|" + strCurrentCity);
-        m.setDob(UtilityHelper.getDateTime(txtDOB.getText().toString(), true));
+
+        String strDob = txtDOB.getText().toString();
+        if (strDob.equals("")) {
+            Toast.makeText(this,"Please input birthday.",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        m.setDob(UtilityHelper.getDateTime(strDob, true));
         m.setNric(txtNRIC.getText().toString());
         m.setEducation(strEducation);
         m.setIncome(strIncome);
@@ -717,8 +726,19 @@ public class CreateActivity extends AppCompatActivity {
         m.setReferrer(AppValues.getInstance().loginUser.getUser_name());
         m.setStatus("unsync");
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        String strDate = dateFormat.format(date);
+        m.setCreatedOn(UtilityHelper.getDateTime(strDate,false));
+
         try {
             dbH.createMeller(m);
+
+            AppValues.getInstance().mellers.add(m);
+            AppValues.getInstance().mellerAdapter.notifyDataSetChanged();
+
+            dbH.updateCallNumberStatus(txtMobileNumber.getText().toString(),"Profiled");
+
             finish();
         } catch (Exception e) {
             e.printStackTrace();
@@ -733,9 +753,40 @@ public class CreateActivity extends AppCompatActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        finish();
+                        TextView txtMobileNumber = (TextView) findViewById(R.id.txtMobileNumber);
+                        String strMobileNumber = txtMobileNumber.getText().toString();
+                        if (strMobileNumber.equals("")) {
+                            finish();
+                        }
+                        else {
+                            updateCallStatusDialog(strMobileNumber);
+                        }
                     }
                 }).setNegativeButton("No", null).show();
+    }
+
+    private void updateCallStatusDialog(final String number) {
+
+        final String statuses[] = new String[] {
+                "Not pick up",
+                "Line busy",
+                "Not interested",
+                "Invalid number",
+                "To callback",
+                "Other"};
+
+        final DBHelper dbH = new DBHelper(this);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Update number status");
+        builder.setItems(statuses, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+                dbH.updateCallNumberStatus(number,statuses[which]);
+            }
+        });
+        builder.show();
     }
 
     @Override

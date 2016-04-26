@@ -16,15 +16,17 @@ import com.xavey.diego.R;
 import com.xavey.diego.activity.CreateActivity;
 import com.xavey.diego.adapter.CallNumberAdapter;
 import com.xavey.diego.api.model.CallNumber;
+import com.xavey.diego.helper.AppValues;
 import com.xavey.diego.helper.DBHelper;
 
 import java.util.ArrayList;
 
 
-public class ProspectsFragment extends Fragment implements AdapterView.OnItemClickListener {
+
+public class ProspectsFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private Context mContext;
-    private ArrayList<CallNumber> mNumbers = null;
+    private ListView lvProspects;
 
     public ProspectsFragment() {
 
@@ -38,26 +40,26 @@ public class ProspectsFragment extends Fragment implements AdapterView.OnItemCli
         mContext = getActivity().getApplicationContext();
 
         View rootView = inflater.inflate(R.layout.fragment_prospects, container, false);
-        ListView lvProspects = (ListView) rootView.findViewById(R.id.listview_prospects);
+        lvProspects = (ListView) rootView.findViewById(R.id.listview_prospects);
         DBHelper dbHelper = new DBHelper(mContext);
 
-
         try {
-            mNumbers = dbHelper.getNumbers();
+            AppValues.getInstance().mNumbers = dbHelper.getNumbers();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        CallNumberAdapter callNumberAdapter = new CallNumberAdapter(mNumbers, mContext);
-        lvProspects.setAdapter(callNumberAdapter);
+        AppValues.getInstance().callNumberAdapter = new CallNumberAdapter(AppValues.getInstance().mNumbers, mContext);
+        lvProspects.setAdapter(AppValues.getInstance().callNumberAdapter);
         lvProspects.setOnItemClickListener(this);
+        lvProspects.setOnItemLongClickListener(this);
 
         return rootView;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        CallNumber n = mNumbers.get(position);
+        CallNumber n = AppValues.getInstance().mNumbers.get(position);
         Intent intent = new Intent(getActivity(), CreateActivity.class);
         intent.putExtra(CreateActivity.P_NUMBER, n.getNumber());
         startActivity(intent);
@@ -65,5 +67,10 @@ public class ProspectsFragment extends Fragment implements AdapterView.OnItemCli
         Intent dial= new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + n.getNumber()));
 
         startActivity(dial);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        return false;
     }
 }
