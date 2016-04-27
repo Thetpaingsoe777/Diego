@@ -18,19 +18,30 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.xavey.diego.R;
+import com.xavey.diego.api.SampleClient;
+import com.xavey.diego.api.model.API_Response;
+import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.fragment.ProspectsFragment;
 import com.xavey.diego.fragment.ReferralsFragment;
 import com.xavey.diego.helper.AppValues;
 import com.xavey.diego.helper.DBHelper;
 import com.xavey.diego.helper.UtilityHelper;
 
+import java.util.ArrayList;
 import java.util.Date;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Context mContext;
     String AuthToken="";
+    Menu mMenu;
+    DBHelper dbH;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,28 +53,6 @@ public class DashboardActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        try {
-//            AuthToken= TokenHelper.genAPIToken(mContext, DashboardActivity.this);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        if (AuthToken != "") {
-//            final DBHelper dbH = new DBHelper(mContext);
-//            try {
-//                User dbUser = dbH.getUser();
-//                TextView tvMID = (TextView) findViewById(R.id.txtDrawerMellerID);
-//                tvMID.setText(dbUser.getFull_name());
-//                TextView tvMobile = (TextView) findViewById(R.id.txtDrawerMobile);
-//                tvMobile.setText(dbUser.getPhone());
-//
-//            } catch (Exception e) {
-//                Log.d("AuthAPI", e.getStackTrace().toString());
-//            }
-//        }
-
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -73,7 +62,7 @@ public class DashboardActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        final DBHelper dbH = new DBHelper(mContext);
+        dbH = new DBHelper(mContext);
         try {
             View v = (View) navigationView.getHeaderView(0);
             TextView tvMID = (TextView)v.findViewById(R.id.txtDrawerMellerID);
@@ -105,6 +94,7 @@ public class DashboardActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.dashboard, menu);
+        mMenu = menu;
         return true;
     }
 
@@ -119,6 +109,10 @@ public class DashboardActivity extends AppCompatActivity
         if (id == R.id.action_new_meller) {
             Intent intent = new Intent(mContext,CreateActivity.class);
             mContext.startActivity(intent);
+            return true;
+        }
+        else if (id == R.id.action_sync_meller) {
+            SyncLoop();
             return true;
         }
 
@@ -140,6 +134,7 @@ public class DashboardActivity extends AppCompatActivity
                 transaction.commit();
             }
         } else if (id == R.id.nav_prospects) {
+            mMenu.setGroupVisible(R.id.sync_menu_group, false);
             if (findViewById(R.id.container) != null) {
                 Fragment newFragment = new ProspectsFragment();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -148,7 +143,7 @@ public class DashboardActivity extends AppCompatActivity
                 transaction.commit();
             }
         } else if (id == R.id.nav_settings) {
-
+            mMenu.setGroupVisible(R.id.sync_menu_group, false);
         } else if (id == R.id.nav_logout) {
             finish();
             Intent intent = new Intent(mContext,LoginActivity.class);
@@ -159,6 +154,66 @@ public class DashboardActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void SyncLoop(){
+        try {
+            Meller m = dbH.getMellerUnSynced();
+            if(m!=null && m.getStatus().equals(AppValues.getInstance().sync_full_profile_error)){
+                SyncProfile(m);
+            }
+            else if(m!=null){
+                SyncReg(m);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void SyncReg(final Meller m){
+        m.setUser_name(m.getPhone());
+        m.setHashed_password(m.getPhone().substring(m.getPhone().length()-6,m.getPhone().length()));
+        SampleClient.getWoodyApiClient(this).postNewUser(m,AppValues.getInstance().loginUser.getUser_name(), new Callback<API_Response>() {//change update process
+                    @Override
+                    public void success(API_Response apiRes, Response response) {
+                        if(!apiRes.getMessage().equals(null)&&apiRes.getMessage().equals("010")){
+                            dbH.updateRegStatus(m.getPhone(),AppValues.getInstance().sync_reg_ok,apiRes.getExtra());
+                            m.set_id(apiRes.getExtra());
+                            SyncProfile(m);
+                        }
+                        else{
+                            dbH.updateRegStatus(m.getPhone(),AppValues.getInstance().sync_reg_error,null);
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        dbH.updateRegStatus(m.getPhone(),AppValues.getInstance().sync_reg_error,null);
+                    }
+                });
+    }
+
+    private void SyncProfile(final Meller m){
+        SampleClient.getWoodyApiClient(this).postFullProfile(m.get_id(),m.getFull_name(),m.getPhone(),m.getGender(),m.getDob(),m.getNric()
+                ,m.getCurrent_city(),m.getIncome(),m.getEducation(),m.getMarital(),m.getEmployment(),m.getCareer(),m.getJobFunction(),m.getIndustry()
+                ,m.getTelco(),m.getReligion(),m.getRace(),(m.getBankAccount().equals("true")?true:false),(m.getSmoker().equals("true")?true:false)
+                ,(m.getDrinker().equals("true")?true:false),"tele_inhouse", new Callback<API_Response>() {//change update process
+            @Override
+            public void success(API_Response apiRes, Response response) {
+                if(!apiRes.getMessage().equals(null)&&apiRes.getMessage().equals("010")){
+                    dbH.updateRegStatus(m.getPhone(), AppValues.getInstance().sync_ok, null);
+                    SyncLoop();
+                }
+                else{
+                    dbH.updateRegStatus(m.getPhone(),AppValues.getInstance().sync_full_profile_error,null);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                dbH.updateRegStatus(m.getPhone(),AppValues.getInstance().sync_full_profile_error,null);
+            }
+        });
     }
 
 

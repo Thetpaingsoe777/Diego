@@ -30,6 +30,12 @@ public class AppValues{
     public static CallNumberAdapter callNumberAdapter;
     public ArrayList<CallNumber> mNumbers = null;
 
+    public static String sync_none = "unsync";
+    public static String sync_ok = "ok";
+    public static String sync_reg_ok = "reg_ok";
+    public static String sync_reg_error = "reg_error";
+    public static String sync_full_profile_error = "full_profile_error";
+
     private AppValues(){
     }
 

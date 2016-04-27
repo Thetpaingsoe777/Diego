@@ -1,6 +1,7 @@
 package com.xavey.diego.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +10,10 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xavey.diego.activity.CreateActivity;
 import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.R;
+import com.xavey.diego.helper.AppValues;
 import com.xavey.diego.helper.UtilityHelper;
 
 import org.w3c.dom.Text;
@@ -72,7 +75,7 @@ public class MellerAdapter extends BaseAdapter {
         mHolder.tvFullName.setText(user.getFull_name());
         mHolder.tvNumber.setText(user.getPhone());
         mHolder.tvGender.setText(user.getGender());
-        mHolder.tvDOB.setText(UtilityHelper.getDateTime(user.getDob(),true));
+        mHolder.tvDOB.setText(UtilityHelper.getDateTime(user.getDob(), true));
         if (user.getCreatedOn() != null) {
             mHolder.tvCreatedOn.setText(user.getCreatedOn().toString());
         }
@@ -81,6 +84,25 @@ public class MellerAdapter extends BaseAdapter {
         }
         mHolder.tvReferrer.setText(user.getReferrer());
         mHolder.tvStatus.setText(user.getStatus());
+
+        if(user.getStatus().equals(AppValues.getInstance().sync_ok)){
+            mHolder.tvStatus.setTextColor(mContext.getResources().getColor(R.color.green_500));
+        }
+        else if(user.getStatus().equals(AppValues.getInstance().sync_none)){
+            mHolder.tvStatus.setTextColor(mContext.getResources().getColor(R.color.grey_500));
+        }
+        else{
+            mHolder.tvStatus.setTextColor(mContext.getResources().getColor(R.color.red_500));
+        }
+
+        child.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent intent = new Intent(mContext, CreateActivity.class);
+                //intent.putExtra(CreateActivity.EXTRA_ID, user.get_id());
+                //mContext.startActivity(intent);
+            }
+        });
 
         return child;
     }

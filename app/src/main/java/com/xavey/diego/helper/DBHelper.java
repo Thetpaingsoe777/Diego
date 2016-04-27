@@ -186,8 +186,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_NOTI); //with if not exists
         ContentValues cv=new ContentValues();
         cv.put(N_CHECKED, 1);
-        db.update(TABLE_NOTI, cv , N_POST+"='"+id+"' AND date("+N_CREATED_ON+")<=?",
-                new String[]{"date('" + UtilityHelper.getDateTime(date,false)+"')"});
+        db.update(TABLE_NOTI, cv, N_POST + "='" + id + "' AND date(" + N_CREATED_ON + ")<=?",
+                new String[]{"date('" + UtilityHelper.getDateTime(date, false) + "')"});
     }
 
     public void deleteNoti() throws Exception{
@@ -259,7 +259,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(M_FULLNAME, meller.getFull_name());
         values.put(M_GENDER, meller.getGender());
         values.put(M_CURRENT_CITY, meller.getCurrent_city());
-        values.put(M_DOB, UtilityHelper.getDateTime(meller.getDob(),true));
+        values.put(M_DOB, UtilityHelper.getDateTime(meller.getDob(), true));
         values.put(M_NRIC, meller.getNric());
         values.put(M_EDU, meller.getEducation());
         values.put(M_INCOME, meller.getIncome());
@@ -279,6 +279,48 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(M_STATUS, meller.getStatus());
 
         db.insert(TABLE_MELLER, null, values);
+    }
+
+    public void updateMeller(Meller meller) throws  Exception {
+        SQLiteDatabase db = getWritableDatabase();
+
+        String selectQuery = "SELECT * FROM " + TABLE_MELLER + " WHERE " + M_PHONE + " = '" + meller.getPhone() + "' LIMIT 1";
+        Log.e(LOG, selectQuery);
+        Cursor mCursor = db.rawQuery(selectQuery, null);
+
+        Meller m = null;
+
+        if (mCursor != null && mCursor.getCount() > 1) {
+            mCursor.close();
+
+        } else {
+
+            ContentValues values = new ContentValues();
+            values.put(M_PHONE, meller.getPhone());
+            values.put(M_FULLNAME, meller.getFull_name());
+            values.put(M_GENDER, meller.getGender());
+            values.put(M_CURRENT_CITY, meller.getCurrent_city());
+            values.put(M_DOB, UtilityHelper.getDateTime(meller.getDob(), true));
+            values.put(M_NRIC, meller.getNric());
+            values.put(M_EDU, meller.getEducation());
+            values.put(M_INCOME, meller.getIncome());
+            values.put(M_MARITAL, meller.getMarital());
+            values.put(M_EMPLOYMENT, meller.getEmployment());
+            values.put(M_CAREER, meller.getCareer());
+            values.put(M_INCOME, meller.getIncome());
+            values.put(M_JOBFUNC, meller.getJobFunction());
+            values.put(M_TELCO, meller.getTelco());
+            values.put(M_RELIGION, meller.getReligion());
+            values.put(M_RACE, meller.getRace());
+            values.put(M_BANK, meller.getBankAccount());
+            values.put(M_SMOKE, meller.getSmoker());
+            values.put(M_DRINK, meller.getDrinker());
+            values.put(M_CREATED, UtilityHelper.getDateTime(meller.getCreatedOn(), false).toString());
+            values.put(M_REFERRER, meller.getReferrer());
+            values.put(M_STATUS, meller.getStatus());
+
+            //db.update(TABLE_MELLER, values, M_ID + "='" + m.get_id() + "' AND date(" + N_CREATED_ON + ")<=?", new String[]{"date('" + getDateTime(date) + "')"});
+        }
     }
 
     public void deleteUser() throws Exception{
@@ -312,7 +354,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public ArrayList<Meller> getMellers() throws Exception {
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_MELLER;
+        String selectQuery = "SELECT * FROM " + TABLE_MELLER +" WHERE "+M_REFERRER+"='"+AppValues.getInstance().loginUser.getUser_name()+"'";
         Log.e(LOG, selectQuery);
         Cursor mCursor = db.rawQuery(selectQuery, null);
 
@@ -361,6 +403,110 @@ public class DBHelper extends SQLiteOpenHelper {
         mCursor.close();
 
         return mellers;
+    }
+
+    public Meller getMellerUnSynced() throws Exception {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_MELLER + " WHERE "+ M_STATUS +" != '"+ AppValues.getInstance().sync_ok +"' LIMIT 1";
+        Log.e(LOG, selectQuery);
+        Cursor mCursor = db.rawQuery(selectQuery, null);
+
+        Meller m = null;
+
+        if (mCursor != null && mCursor.getCount()>0) {
+            mCursor.moveToFirst();
+            m = new Meller();
+            m.set_id(mCursor.getString(mCursor.getColumnIndex(M_ID)));
+            m.setFullName(mCursor.getString(mCursor.getColumnIndex(M_FULLNAME)));
+            m.setPhone(mCursor.getString(mCursor.getColumnIndex(M_PHONE)));
+            m.setGender(mCursor.getString(mCursor.getColumnIndex(M_GENDER)));
+            m.setDob(UtilityHelper.getDateTime(mCursor.getString(mCursor.getColumnIndex(M_DOB)), true));
+            m.setCurrentCity(mCursor.getString(mCursor.getColumnIndex(M_CURRENT_CITY)));
+            m.setNric(mCursor.getString(mCursor.getColumnIndex(M_NRIC)));
+            m.setEducation(mCursor.getString(mCursor.getColumnIndex(M_EDU)));
+            m.setIncome(mCursor.getString(mCursor.getColumnIndex(M_INCOME)));
+            m.setMarital(mCursor.getString(mCursor.getColumnIndex(M_MARITAL)));
+            m.setEmployment(mCursor.getString(mCursor.getColumnIndex(M_EMPLOYMENT)));
+            m.setCareer(mCursor.getString(mCursor.getColumnIndex(M_CAREER)));
+            m.setIncome(mCursor.getString(mCursor.getColumnIndex(M_INCOME)));
+            m.setJobFunction(mCursor.getString(mCursor.getColumnIndex(M_JOBFUNC)));
+            m.setTelco(mCursor.getString(mCursor.getColumnIndex(M_TELCO)));
+            m.setReligion(mCursor.getString(mCursor.getColumnIndex(M_RELIGION)));
+            m.setRace(mCursor.getString(mCursor.getColumnIndex(M_RACE)));
+            m.setBankAccount(mCursor.getString(mCursor.getColumnIndex(M_BANK)));
+            m.setSmoker(mCursor.getString(mCursor.getColumnIndex(M_SMOKE)));
+            m.setDrinker(mCursor.getString(mCursor.getColumnIndex(M_DRINK)));
+
+            String strCreatedOn = mCursor.getString(mCursor.getColumnIndex(M_CREATED));
+
+            m.setCreatedOn(UtilityHelper.getDateTime(strCreatedOn, false));
+            m.setReferrer(mCursor.getString(mCursor.getColumnIndex(M_REFERRER)));
+            m.setStatus(mCursor.getString(mCursor.getColumnIndex(M_STATUS)));
+            mCursor.close();
+        }
+
+        return m;
+    }
+
+    public Meller getMellerByPhone(String phone) throws Exception {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_MELLER + " WHERE "+ M_PHONE +" = '"+ phone +"' LIMIT 1";
+        Log.e(LOG, selectQuery);
+        Cursor mCursor = db.rawQuery(selectQuery, null);
+
+        Meller m = null;
+
+        if (mCursor != null && mCursor.getCount()>0) {
+            mCursor.moveToFirst();
+            m = new Meller();
+            m.set_id(mCursor.getString(mCursor.getColumnIndex(M_ID)));
+            m.setFullName(mCursor.getString(mCursor.getColumnIndex(M_FULLNAME)));
+            m.setPhone(mCursor.getString(mCursor.getColumnIndex(M_PHONE)));
+            m.setGender(mCursor.getString(mCursor.getColumnIndex(M_GENDER)));
+            m.setDob(UtilityHelper.getDateTime(mCursor.getString(mCursor.getColumnIndex(M_DOB)), true));
+            m.setCurrentCity(mCursor.getString(mCursor.getColumnIndex(M_CURRENT_CITY)));
+            m.setNric(mCursor.getString(mCursor.getColumnIndex(M_NRIC)));
+            m.setEducation(mCursor.getString(mCursor.getColumnIndex(M_EDU)));
+            m.setIncome(mCursor.getString(mCursor.getColumnIndex(M_INCOME)));
+            m.setMarital(mCursor.getString(mCursor.getColumnIndex(M_MARITAL)));
+            m.setEmployment(mCursor.getString(mCursor.getColumnIndex(M_EMPLOYMENT)));
+            m.setCareer(mCursor.getString(mCursor.getColumnIndex(M_CAREER)));
+            m.setIncome(mCursor.getString(mCursor.getColumnIndex(M_INCOME)));
+            m.setJobFunction(mCursor.getString(mCursor.getColumnIndex(M_JOBFUNC)));
+            m.setTelco(mCursor.getString(mCursor.getColumnIndex(M_TELCO)));
+            m.setReligion(mCursor.getString(mCursor.getColumnIndex(M_RELIGION)));
+            m.setRace(mCursor.getString(mCursor.getColumnIndex(M_RACE)));
+            m.setBankAccount(mCursor.getString(mCursor.getColumnIndex(M_BANK)));
+            m.setSmoker(mCursor.getString(mCursor.getColumnIndex(M_SMOKE)));
+            m.setDrinker(mCursor.getString(mCursor.getColumnIndex(M_DRINK)));
+
+            String strCreatedOn = mCursor.getString(mCursor.getColumnIndex(M_CREATED));
+
+            m.setCreatedOn(UtilityHelper.getDateTime(strCreatedOn, false));
+            m.setReferrer(mCursor.getString(mCursor.getColumnIndex(M_REFERRER)));
+            m.setStatus(mCursor.getString(mCursor.getColumnIndex(M_STATUS)));
+            mCursor.close();
+        }
+
+        return m;
+    }
+
+    public void updateRegStatus(String number, String status, String id) {
+        SQLiteDatabase db = getWritableDatabase();
+        if(id==null){
+            db.execSQL("update "+ TABLE_MELLER +" set "+M_STATUS+" ='" + status + "' where "+M_PHONE+" = '" + number + "' ");
+        }
+        else{
+            db.execSQL("update " + TABLE_MELLER + " set " + M_STATUS + " ='" + status + "', " + M_ID + " ='" + id + "'  where " + M_PHONE + " = '" + number + "' ");
+        }
+
+        try {
+            AppValues.getInstance().mellers.clear();
+            AppValues.getInstance().mellers.addAll(getMellers());
+            AppValues.getInstance().mellerAdapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public User getUser() throws Exception {

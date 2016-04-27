@@ -19,7 +19,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.okhttp.internal.Util;
 import com.xavey.diego.R;
 import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.helper.AppValues;
@@ -29,11 +28,11 @@ import com.xavey.diego.helper.UtilityHelper;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 public class CreateActivity extends AppCompatActivity {
 
-    public static final String P_NUMBER = "";
+        public static final String EXTRA_ID = "EXTRA_ID";
+        public static final String P_NUMBER = "";
     private String preState = "Current State/Region";
     private String preCity = "Current City/Township";
     private String preEduc = "Education Level";
@@ -49,7 +48,33 @@ public class CreateActivity extends AppCompatActivity {
 
     private DatePickerDialog dpDOB;
     private SimpleDateFormat dateFormatter;
-    private TextView txtDOB;
+    //private TextView txtDOB;
+    DBHelper dbH;
+
+    EditText txtMobileNumber;
+    EditText txtName;
+    RadioButton rdMale;
+    RadioButton rdFemale;
+    Spinner spinnerState;
+    Spinner spinnerCity;
+    TextView txtDOB;
+    TextView txtNRIC;
+    Spinner spinnerEducation;
+    Spinner spinnerIncome;
+    Spinner spinnerMarital;
+    Spinner spinnerEmp;
+    Spinner spinnerCareer;
+    Spinner spinnerJobfunc;
+    Spinner spinnerIndustry;
+    Spinner spinnerTelco;
+    Spinner spinnerReligion;
+    Spinner spinnerRace;
+    RadioButton radioBankYes;
+    RadioButton radioBankNo;
+    RadioButton radioSmokerYes;
+    RadioButton radioSmokerNo;
+    RadioButton radioDrinkerYes;
+    RadioButton radioDrinkerNo;
 
     String[] citySet = {preState,
             "Ayeyarwady",
@@ -509,7 +534,7 @@ public class CreateActivity extends AppCompatActivity {
 
 
     String selectedCity ="";
-    String _id;
+    String _phone;
     String password;
     String loadedCity="";
     String loadedTown="";
@@ -575,34 +600,7 @@ public class CreateActivity extends AppCompatActivity {
 
     private void createMeller() {
 
-        DBHelper dbH = new DBHelper(this);
-
         Meller m = new Meller();
-
-        EditText txtMobileNumber = (EditText)findViewById(R.id.txtMobileNumber);
-        EditText txtName = (EditText)findViewById(R.id.txtName);
-        RadioButton rdMale = (RadioButton)findViewById(R.id.rdMale);
-        RadioButton rdFemale = (RadioButton)findViewById(R.id.rdFemale);
-        Spinner spinnerState = (Spinner)findViewById(R.id.spinnerState);
-        Spinner spinnerCity = (Spinner)findViewById(R.id.spinnerCity);
-        TextView txtDOB = (TextView)findViewById(R.id.txtDOB);
-        TextView txtNRIC = (TextView)findViewById(R.id.txtNRIC);
-        Spinner spinnerEducation = (Spinner)findViewById(R.id.spinnerEducation);
-        Spinner spinnerIncome = (Spinner)findViewById(R.id.spinnerIncome);
-        Spinner spinnerMarital = (Spinner)findViewById(R.id.spinnerMarital);
-        Spinner spinnerEmp = (Spinner)findViewById(R.id.spinnerEmp);
-        Spinner spinnerCareer = (Spinner)findViewById(R.id.spinnerCareer);
-        Spinner spinnerJobfunc = (Spinner)findViewById(R.id.spinnerJobfunc);
-        Spinner spinnerIndustry = (Spinner)findViewById(R.id.spinnerIndustry);
-        Spinner spinnerTelco = (Spinner)findViewById(R.id.spinnerTelco);
-        Spinner spinnerReligion = (Spinner)findViewById(R.id.spinnerReligion);
-        Spinner spinnerRace = (Spinner)findViewById(R.id.spinnerRace);
-        RadioButton radioBankYes = (RadioButton)findViewById(R.id.radioBankYes);
-        RadioButton radioBankNo = (RadioButton)findViewById(R.id.radioBankNo);
-        RadioButton radioSmokerYes = (RadioButton)findViewById(R.id.radioSmokerYes);
-        RadioButton radioSmokerNo = (RadioButton)findViewById(R.id.radioSmokerNo);
-        RadioButton radioDrinkerYes = (RadioButton)findViewById(R.id.radioDrinkerYes);
-        RadioButton radioDrinkerNo = (RadioButton)findViewById(R.id.radioDrinkerNo);
 
         String strCurrentState = spinnerState.getSelectedItem()==null? preState :spinnerState.getSelectedItem().toString();
         if (strCurrentState.equals(preState)) {
@@ -724,7 +722,7 @@ public class CreateActivity extends AppCompatActivity {
         m.setReligion(strReligion);
         m.setRace(strRace);
         m.setReferrer(AppValues.getInstance().loginUser.getUser_name());
-        m.setStatus("unsync");
+        m.setStatus(AppValues.getInstance().sync_none);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
@@ -732,13 +730,15 @@ public class CreateActivity extends AppCompatActivity {
         m.setCreatedOn(UtilityHelper.getDateTime(strDate,false));
 
         try {
-            dbH.createMeller(m);
-
-            AppValues.getInstance().mellers.add(m);
-            AppValues.getInstance().mellerAdapter.notifyDataSetChanged();
-
-            dbH.updateCallNumberStatus(txtMobileNumber.getText().toString(),"Profiled");
-
+            if (_phone.equals(null) || _phone.equals("")) {
+                dbH.createMeller(m);
+                AppValues.getInstance().mellers.add(m);
+                AppValues.getInstance().mellerAdapter.notifyDataSetChanged();
+                dbH.updateCallNumberStatus(txtMobileNumber.getText().toString(), "Profiled");
+            }
+            else{
+                dbH.updateMeller(m);
+            }
             finish();
         } catch (Exception e) {
             e.printStackTrace();
@@ -794,7 +794,7 @@ public class CreateActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
-
+        dbH = new DBHelper(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.create_toolbar);
         if (toolbar != null) {
             toolbar.setTitle(R.string.create_meller);
@@ -808,6 +808,31 @@ public class CreateActivity extends AppCompatActivity {
                 }
             });
         }
+
+        txtMobileNumber = (EditText)findViewById(R.id.txtMobileNumber);
+        txtName = (EditText)findViewById(R.id.txtName);
+        rdMale = (RadioButton)findViewById(R.id.rdMale);
+        rdFemale = (RadioButton)findViewById(R.id.rdFemale);
+        spinnerState = (Spinner)findViewById(R.id.spinnerState);
+        spinnerCity = (Spinner)findViewById(R.id.spinnerCity);
+        txtDOB = (TextView)findViewById(R.id.txtDOB);
+        txtNRIC = (TextView)findViewById(R.id.txtNRIC);
+        spinnerEducation = (Spinner)findViewById(R.id.spinnerEducation);
+        spinnerIncome = (Spinner)findViewById(R.id.spinnerIncome);
+        spinnerMarital = (Spinner)findViewById(R.id.spinnerMarital);
+        spinnerEmp = (Spinner)findViewById(R.id.spinnerEmp);
+        spinnerCareer = (Spinner)findViewById(R.id.spinnerCareer);
+        spinnerJobfunc = (Spinner)findViewById(R.id.spinnerJobfunc);
+        spinnerIndustry = (Spinner)findViewById(R.id.spinnerIndustry);
+        spinnerTelco = (Spinner)findViewById(R.id.spinnerTelco);
+        spinnerReligion = (Spinner)findViewById(R.id.spinnerReligion);
+        spinnerRace = (Spinner)findViewById(R.id.spinnerRace);
+        radioBankYes = (RadioButton)findViewById(R.id.radioBankYes);
+        radioBankNo = (RadioButton)findViewById(R.id.radioBankNo);
+        radioSmokerYes = (RadioButton)findViewById(R.id.radioSmokerYes);
+        radioSmokerNo = (RadioButton)findViewById(R.id.radioSmokerNo);
+        radioDrinkerYes = (RadioButton)findViewById(R.id.radioDrinkerYes);
+        radioDrinkerNo = (RadioButton)findViewById(R.id.radioDrinkerNo);
 
         dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         setDateTimeField();
@@ -972,6 +997,134 @@ public class CreateActivity extends AppCompatActivity {
                 raceSet);
         raceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerRace.setAdapter(raceAdapter);
+
+        if(getIntent().getStringExtra(EXTRA_ID)!=null){
+            _phone = getIntent().getStringExtra(EXTRA_ID);
+            loadProfile();
+        }
+    }
+
+    private void loadProfile(){
+        try {
+            Meller m = dbH.getMellerByPhone(_phone);
+            if(m!=null){
+
+                txtMobileNumber.setText(m.getPhone());
+                txtName.setText(m.getFull_name());
+                if(m.getGender().equals("male")){
+                    rdMale.setChecked(true);
+                }
+                if(m.getGender().equals("female")){
+                    rdFemale.setChecked(true);
+                }
+                if(m.getCurrent_city()!=null&&m.getCurrent_city().length()>0) {
+                    for(int i=0; i<spinnerState.getChildCount();i++)
+                    {
+                        if(spinnerState.getItemAtPosition(i).toString().equals(m.getCurrent_city().split("|")[0])){
+                            spinnerState.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getCurrent_city()!=null&&m.getCurrent_city().length()>1) {
+                    for(int i=0; i<spinnerCity.getChildCount();i++)
+                    {
+                        if(spinnerCity.getItemAtPosition(i).toString().equals(m.getCurrent_city().split("|")[1])){
+                            spinnerCity.setSelection(i);
+                        }
+                    }
+                }
+                txtDOB.setText(dateFormatter.format(m.getDob().getTime()));
+                txtNRIC.setText(m.getNric());
+                if(m.getEducation()!=null) {
+                    for(int i=0; i<spinnerEducation.getChildCount();i++)
+                    {
+                        if(spinnerEducation.getItemAtPosition(i).toString().equals(m.getEducation())){
+                            spinnerEducation.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getIncome()!=null) {
+                    for(int i=0; i<spinnerIncome.getChildCount();i++)
+                    {
+                        if(spinnerIncome.getItemAtPosition(i).toString().equals(m.getIncome())){
+                            spinnerIncome.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getMarital()!=null) {
+                    for(int i=0; i<spinnerMarital.getChildCount();i++)
+                    {
+                        if(spinnerMarital.getItemAtPosition(i).toString().equals(m.getMarital())){
+                            spinnerMarital.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getEmployment()!=null) {
+                    for(int i=0; i<spinnerEmp.getChildCount();i++)
+                    {
+                        if(spinnerEmp.getItemAtPosition(i).toString().equals(m.getEmployment())){
+                            spinnerEmp.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getCareer()!=null) {
+                    for(int i=0; i<spinnerCareer.getChildCount();i++)
+                    {
+                        if(spinnerCareer.getItemAtPosition(i).toString().equals(m.getCareer())){
+                            spinnerCareer.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getJobFunction()!=null) {
+                    for(int i=0; i<spinnerJobfunc.getChildCount();i++)
+                    {
+                        if(spinnerJobfunc.getItemAtPosition(i).toString().equals(m.getJobFunction())){
+                            spinnerJobfunc.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getIndustry()!=null) {
+                    for(int i=0; i<spinnerIndustry.getChildCount();i++)
+                    {
+                        if(spinnerIndustry.getItemAtPosition(i).toString().equals(m.getIndustry())){
+                            spinnerIndustry.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getTelco()!=null) {
+                    for(int i=0; i<spinnerTelco.getChildCount();i++)
+                    {
+                        if(spinnerTelco.getItemAtPosition(i).toString().equals(m.getTelco())){
+                            spinnerTelco.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getReligion()!=null) {
+                    for(int i=0; i<spinnerReligion.getChildCount();i++)
+                    {
+                        if(spinnerReligion.getItemAtPosition(i).toString().equals(m.getReligion())){
+                            spinnerReligion.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getRace()!=null) {
+                    for(int i=0; i<spinnerRace.getChildCount();i++)
+                    {
+                        if(spinnerRace.getItemAtPosition(i).toString().equals(m.getRace())){
+                            spinnerRace.setSelection(i);
+                        }
+                    }
+                }
+                if(m.getBankAccount().equals("yes")){radioBankYes.setChecked(true);}
+                if(m.getBankAccount().equals("no")){radioBankNo.setChecked(true);}
+                if(m.getSmoker().equals("no")){radioSmokerYes.setChecked(true);}
+                if(m.getSmoker().equals("no")){radioSmokerNo.setChecked(true);}
+                if(m.getDrinker().equals("no")){radioDrinkerYes.setChecked(true);}
+                if(m.getDrinker().equals("no")){radioDrinkerNo.setChecked(true);}
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void forTown(String[]township){

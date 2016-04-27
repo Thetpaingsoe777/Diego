@@ -30,19 +30,9 @@ public interface WoodyApiInterface {
     @GET("/api/version")
     void getVersion(Callback<Version> result);
 
-    @FormUrlEncoded
-    @POST("/api/oauth/token")
-    void postAuthToken(@Field("grant_type") String granttype,
-                       @Field("client_id") String clientid,
-                       @Field("client_secret") String clientsecret,
-                       @Field("username") String username,
-                       @Field("password") String password,
-                       Callback<Auth> result);
-
     @Multipart
-    @POST("/api/users/fullprofile/")
-    void postFullProfile(@Header("Authorization") String authorization,
-                         @Part("uploaded_file") TypedFile file,
+    @POST("/api/users/regen/")
+    void postFullProfile(@Part("user_id") String user_id,
                          @Part("full_name") String full_name,
                          @Part("phone") String phone,
                          @Part("gender") String gender,
@@ -51,22 +41,19 @@ public interface WoodyApiInterface {
                          @Part("current_city") String current_city,
                          @Part("income") String income,
                          @Part("education") String education,
-                         @Part("facebook_id") String facebook_id,
-                         @Part("facebook_token") String facebook_token,
-                         Callback<API_Response> result);
-
-    @Multipart
-    @POST("/api/users/fullprofile/")
-    void postFullProfile(@Header("Authorization") String authorization,
-                         @Part("full_name") String full_name,
-                         @Part("phone") String phone,
-                         @Part("gender") String gender,
-                         @Part("dob") Date dob,
-                         @Part("nric") String nric,
-                         @Part("current_city") String current_city,
-                         @Part("income") String income,
-                         @Part("education") String education,
-                         Callback<API_Response> result);
+                         @Part("marital") String marital,
+                         @Part("employment") String employment,
+                         @Part("career") String career,
+                         @Part("job") String job,
+                         @Part("industry") String industry,
+                         @Part("telco") String telco,
+                         @Part("religion") String religion,
+                         @Part("race") String race,
+                         @Part("bank_account") Boolean bank_account,
+                         @Part("smoker") Boolean smoker,
+                         @Part("alcoholic") Boolean alcoholic,
+                         @Part("ref_camp") String ref_camp,
+                            Callback<API_Response> result);
 
     //basic registration
     @POST("/api/users/reg/{referalName}")

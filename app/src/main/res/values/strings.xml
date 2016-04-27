@@ -16,8 +16,8 @@
     <string name="star_button_description">Favourite this question</string>
 
     <!--<string name="api_endpoint">http://192.168.1.143:3300/</string>>-->
-    <string name="api_endpoint">http://128.199.174.248:3300/</string>
-    <!--<string name="api_endpoint">http://woody.xavey.com:3300/</string>-->
+    <!--<string name="api_endpoint">http://192.168.1.109:3300/</string>-->
+    <string name="api_endpoint">http://woody.xavey.com:3300/</string>
     <string name="facebook_app_id">715337371899870</string>
     <string name="api_endpoint_profile">api/covers/profile/</string>
     <string name="api_endpoint_post">api/covers/post/</string>
@@ -171,6 +171,7 @@
     <string name="title_activity_promote">Promoted Qs</string>
 
     <string name="action_new_meller">New</string>
+    <string name="action_sync_meller">Sync</string>
 
     <string name="gcm_project_number">637974133896</string>
 

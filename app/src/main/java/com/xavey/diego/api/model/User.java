@@ -41,6 +41,7 @@ public class User implements Serializable, Comparable<User> {
     private boolean profile_completed;
     private String facebook_id;
     private String facebook_token;
+    private boolean synced;
     public User() {
     }
 
