@@ -15,7 +15,7 @@
     <string name="info_button_description">Comment</string>
     <string name="star_button_description">Favourite this question</string>
 
-    <!--<string name="api_endpoint">http://192.168.1.143:3300/</string>>-->
+    <!--<string name="api_endpoint">http://192.168.1.147:3300/</string>>-->
     <!--<string name="api_endpoint">http://192.168.1.109:3300/</string>-->
     <string name="api_endpoint">http://woody.xavey.com:3300/</string>
     <string name="facebook_app_id">715337371899870</string>

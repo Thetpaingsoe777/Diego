@@ -10,6 +10,7 @@ import com.xavey.diego.api.model.User;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -32,11 +33,25 @@ public class AppValues{
 
     public static String sync_none = "unsync";
     public static String sync_ok = "ok";
+    public static String sync_skip = "skip";
     public static String sync_reg_ok = "reg_ok";
     public static String sync_reg_error = "reg_error";
     public static String sync_full_profile_error = "full_profile_error";
 
+    public HashMap<String,String> mellermap = new HashMap<String,String>();
+
     private AppValues(){
+        mellermap.put("tayzar","tayzar7");
+        mellermap.put("khineeaindra","eaindra123");
+        mellermap.put("eiyadana","eiyadanar7");
+        mellermap.put("tayzar","tayzar7");
+        mellermap.put("juujuu","doublej");
+        mellermap.put("nweniwin","nweniwin15");
+        mellermap.put("hanzar","hanzaw96");
+        mellermap.put("eithinzar","eithinzar2");
+        mellermap.put("tinzar","tinzar4");
+        mellermap.put("nwenioo","nihon");
+        mellermap.put("shwesin","shwe11");
     }
 
     public static AppValues getInstance(){

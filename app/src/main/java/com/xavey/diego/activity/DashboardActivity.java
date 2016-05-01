@@ -172,8 +172,11 @@ public class DashboardActivity extends AppCompatActivity
 
     private void SyncReg(final Meller m){
         m.setUser_name(m.getPhone());
+        if(m.getUser_name().indexOf("+")==0){
+            m.setUser_name(m.getUser_name().substring(1,m.getUser_name().length()));
+        }
         m.setHashed_password(m.getPhone().substring(m.getPhone().length()-6,m.getPhone().length()));
-        SampleClient.getWoodyApiClient(this).postNewUser(m,AppValues.getInstance().loginUser.getUser_name(), new Callback<API_Response>() {//change update process
+        SampleClient.getWoodyApiClient(this).postNewUser(m,AppValues.getInstance().mellermap.get(AppValues.getInstance().loginUser.getUser_name()), new Callback<API_Response>() {//change update process
                     @Override
                     public void success(API_Response apiRes, Response response) {
                         if(!apiRes.getMessage().equals(null)&&apiRes.getMessage().equals("010")){

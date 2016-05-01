@@ -407,7 +407,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public Meller getMellerUnSynced() throws Exception {
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_MELLER + " WHERE "+ M_STATUS +" != '"+ AppValues.getInstance().sync_ok +"' LIMIT 1";
+        String selectQuery = "SELECT * FROM " + TABLE_MELLER + " WHERE "
+                                +M_REFERRER+"='"+AppValues.getInstance().loginUser.getUser_name()+"' AND "
+                                +M_PHONE+"!='' AND "
+                                + "("+M_STATUS +" != '"+ AppValues.getInstance().sync_ok + "' AND "
+                                +  M_STATUS +" != '"+ AppValues.getInstance().sync_skip +"') LIMIT 1";
         Log.e(LOG, selectQuery);
         Cursor mCursor = db.rawQuery(selectQuery, null);
 

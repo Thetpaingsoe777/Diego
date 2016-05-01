@@ -14,6 +14,7 @@ import com.xavey.diego.activity.CreateActivity;
 import com.xavey.diego.api.model.Meller;
 import com.xavey.diego.R;
 import com.xavey.diego.helper.AppValues;
+import com.xavey.diego.helper.DBHelper;
 import com.xavey.diego.helper.UtilityHelper;
 
 import org.w3c.dom.Text;
@@ -103,6 +104,16 @@ public class MellerAdapter extends BaseAdapter {
                 //mContext.startActivity(intent);
             }
         });
+
+        child.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                DBHelper dbH = new DBHelper(mContext);
+                dbH.updateRegStatus(user.getPhone(), AppValues.getInstance().sync_skip, null);
+                return false;
+            }
+        });
+
 
         return child;
     }
