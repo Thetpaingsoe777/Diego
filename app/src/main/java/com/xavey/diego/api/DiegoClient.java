@@ -23,7 +23,7 @@ import retrofit.converter.GsonConverter;
 /**
  * Created by tinmaungaye on 3/27/15.
  */
-public class SampleClient {
+public class DiegoClient {
 
     //Singleton Instance of our Rest Client
     private static WoodyApiInterface sWoodyService;
